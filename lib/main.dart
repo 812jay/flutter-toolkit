@@ -1,22 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_toolkit/src/services/theme_service.dart';
+import 'package:flutter_toolkit/util/route_path.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => ThemeService(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello'),
-        ),
-      ),
+      builder: (context, child) {
+        return Overlay(
+          initialEntries: [
+            OverlayEntry(
+              builder: (context) => child!,
+            ),
+          ],
+        );
+      },
+      theme: context.themeService.themeData,
+      initialRoute: RoutePath.home,
+      onGenerateRoute: RoutePath.onGenerateRoute,
     );
   }
 }
